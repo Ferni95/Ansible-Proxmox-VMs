@@ -1,0 +1,18 @@
+vms:
+  Docker1:
+    template: CentosTemplate
+    name: Docker13
+    distro: centos7
+    user: "your-user"
+    ssh_key: "SSH-KEY"
+    dns1: "10.10.10.10"
+    dns2: "8.8.4.4"
+    hdd_size: "+10G"
+    cores: "2"
+    ram: "3072"
+    network_device: "virtio,bridge=vmbr0"
+
+  Docker2:
+    name: Docker23
+    distro: ubuntu
+    password: "Hola" #NOT reccomended

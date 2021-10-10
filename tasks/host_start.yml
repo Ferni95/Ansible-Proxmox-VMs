@@ -1,0 +1,26 @@
+---
+- name: Check conectivity  
+  block:
+    - name: 'Check conectivity with hypervisor'
+      wait_for:
+        host: "{{ pve.host_ip }}"
+        port: "{{ pve.test_port }}"
+        delay: 0
+        timeout: 10
+  rescue:
+    - name: WOL to hypervisor
+      wakeonlan:
+        mac: "{{ pve.mac }}"
+        broadcast: "{{ pve.broadcast }}"
+    - name: 'Check conectivity with hypervisor'
+      wait_for:
+        host: "{{ pve.host_ip }}"
+        port: "{{ pve.test_port }}"
+        delay: "{{ pve.test_delay }}"
+        timeout: "{{ pve.test_timeout }}"
+    - name: 'Sleep a bit more'
+      wait_for:
+        delay: 15
+        timeout: 0
+  delegate_to: localhost
+  connection: local

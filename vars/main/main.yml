@@ -1,0 +1,48 @@
+pve:
+  prox_user: "root@pam" #proxmox API user
+  prox_password: "your_proxmox_password"
+  prox_node: "host" #proxmox node
+  host_ip: "your_proxmox_ip" #proxmox node IP
+  clone_timeout: "300" #seconds that clone job spend change based on logs
+  mac: 'XX:XX:XX:XX:XX:XX' #proxmox host mac for WOL
+  broadcast: '255.255.255.255' #broadcast network parameter for WOL
+  img_dir: "/var/tmp/cloud_image"
+
+  # The following port, delay and timeout is for connectivity check
+  # The first delay and timeout are hardcoded as is just to know if the host is up
+  # The second test has variables as no all hypervisors wake up in the same time
+  test_port: 8006 #Proxmox default web port, most of the tasks are done via API.
+  test_delay: 60 #delay after WOL to start checking for connectiviy
+  test_timeout: 120 #timeout after WOL and delay for connectivity check
+
+## URLs for cloud init images
+img_templates:
+  centos7:
+    url: https://cloud.centos.org/altarch/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+  ubuntu:
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+
+
+#Defaults values for VMs /config
+vms_def:
+  template: "CentosTemplate" #VM or template to clone
+  user: "you_user"
+  ssh_key: "SSH-KEY"
+  dns1: "8.8.8.8"
+  dns2: "8.8.4.4"
+  hdd_size: "16G"
+  cores: "1"
+  ram: "2048" #Memory ram for each VM in MB
+  network_device: 'virtio,bridge=vmbr1'
+  clone_full: yes #This is not a VM var, currently this role only accept full clones
+  storage: "vm-lvm" #proxmox storage for VMs
+  distro: centos7
+  ## Proxmox recommened config for cloud init
+  boot_order: "c"
+  boot_disk: "scsi0"
+
+  ## This values are for all the VMs, pending to add as VM var
+  network: "192.168.33." #Network WITHOUT the last digit ## NOT VM VAR
+  netmask: "24" #network mask ## NOT VM VAR
+  gateway: "192.168.33.1" #gateway ### NOT VM var
+

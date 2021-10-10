@@ -1,0 +1,10 @@
+---
+- name: 'Start VM'
+  proxmox_kvm:
+    node: "{{ pve.prox_node }}"
+    api_user: "{{ pve.prox_user }}"
+    api_password: "{{ pve.prox_password }}"
+    api_host: "{{ pve.host_ip }}"
+    name: "{{ item.value.name }}"
+    state: started
+  loop: "{{ vms | dict2items }}"

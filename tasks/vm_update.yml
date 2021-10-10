@@ -1,0 +1,47 @@
+---
+- name: Clone template to new VM
+  proxmox_kvm:
+    node: "{{ pve.prox_node }}"
+    api_user: "{{ pve.prox_user }}"
+    api_password: "{{ pve.prox_password }}"
+    api_host: "{{ pve.host_ip }}"
+    name: "{{ item.value.name }}"
+  register: vm_id
+  loop: "{{ vms | dict2items }}"
+
+- name: Expand disks
+  shell:
+    cmd: "qm resize {{ item.vmid }} scsi0 {{ item.item.value.hdd_size | default(vms_def.hdd_size) }}"
+    chdir: "{{ pve.img_dir }}"
+  loop: "{{ vm_id.results }}"
+  
+- name: Cloud init setup
+  proxmox_kvm:
+    node: "{{ pve.prox_node }}"
+    api_user: "{{ pve.prox_user }}"
+    api_password: "{{ pve.prox_password }}"
+    api_host: "{{ pve.host_ip }}"
+    vmid: "{{ item.vmid }}"
+    ipconfig:
+      ipconfig0: "ip={{ vms_def.network }}{{ item.vmid }}/{{ vms_def.netmask }},gw={{ vms_def.gateway }}"
+    ciuser: "{{ item.item.value.user | default(vms_def.user) }}"
+    cipassword: "{{ item.item.value.password | default(omit) }}" #OPTIONAL
+    sshkeys: "{{ item.item.value.ssh_key | default(vms_def.ssh_key) }}"
+    boot: "{{ item.item.value.boot_order | default(vms_def.boot_order) }}"
+    bootdisk: "{{ item.item.value.boot_disk | default(vms_def.boot_disk) }}"
+    nameservers:
+      - "{{ item.item.value.dns1| default(vms_def.dns1) }}"
+      - "{{ item.item.value.dns2| default(vms_def.dns2) }}"
+    cores: "{{ item.item.value.cores| default(vms_def.cores) }}"
+    memory: "{{ item.item.value.ram| default(vms_def.ram) }}"
+    update: yes
+  loop: "{{ vm_id.results }}"
+
+- name: print data
+  debug: 
+    msg:
+      - "VM: {{ item.invocation.module_args.name}}"
+      - "VM IP: {{ vms_def.network }}{{ item.vmid }}/{{ vms_def.netmask }},gw={{ vms_def.gateway }}"
+      - 'VM User: {{ item.item.value.user | default(vms_def.user) }}'
+  loop: "{{ vm_id.results }}"
+...

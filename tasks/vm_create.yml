@@ -1,0 +1,34 @@
+---
+- name: Create new VM
+  proxmox_kvm:
+    node: "{{ pve.prox_node }}"
+    api_user: "{{ pve.prox_user }}"
+    api_password: "{{ pve.prox_password }}"
+    api_host: "{{ pve.host_ip }}"
+    name: "{{ item.value.name }}"
+    storage: "{{ item.value.storage | default(vms_def.storage) }}" 
+    net:
+      net0: "{{ item.value.network_device | default(vms_def.network_device) }}" 
+  register: vm_id
+  loop: "{{ vms | dict2items }}"
+
+- name: Create directory
+  file:
+    path: "{{ pve.img_dir }}"
+    state: directory
+
+- name: Download cloud images
+  get_url:
+    url: "{{ img_templates[item.item.value.distro]['url'] }}" 
+    dest: "{{ pve.img_dir }}/{{ img_templates[item.item.value.distro]['url'] | basename }}"
+  loop: "{{ vm_id.results }}"
+
+- name: Add disks
+  shell:
+    cmd: |
+      qm importdisk {{ item.vmid }} {{ img_templates[item.item.value.distro]['url'] | basename }} {{ item.value.storage | default(vms_def.storage) }}
+      qm set {{ item.vmid }} -scsihw virtio-scsi-pci -scsi0 {{ item.value.storage | default(vms_def.storage) }}:vm-{{ item.vmid }}-disk-0
+      qm set {{ item.vmid }} --ide2 {{ item.value.storage | default(vms_def.storage) }}:cloudinit
+    chdir: "{{ pve.img_dir }}"
+  loop: "{{ vm_id.results }}"
+...
