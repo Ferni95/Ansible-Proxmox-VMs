@@ -22,7 +22,6 @@ img_templates:
   ubuntu:
     url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 
-
 #Defaults values for VMs /config
 vms_def:
   template: "CentosTemplate" #VM or template to clone
@@ -45,4 +44,3 @@ vms_def:
   network: "192.168.33." #Network WITHOUT the last digit ## NOT VM VAR
   netmask: "24" #network mask ## NOT VM VAR
   gateway: "192.168.33.1" #gateway ### NOT VM var
-
