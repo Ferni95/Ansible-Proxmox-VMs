@@ -1,6 +1,6 @@
 ---
 - import_tasks: tasks/host_start.yml
-  tags: [up,deploy]
+  tags: [up, deploy]
 
 - import_tasks: tasks/vm_create.yml
   tags: [deploy]
@@ -9,13 +9,13 @@
   tags: [clone]
 
 - import_tasks: tasks/vm_update.yml
-  tags: [deploy,clone,update]
+  tags: [deploy, clone, update]
   
 - import_tasks: tasks/vm_start.yml
-  tags: [start,up,deploy,clone]
+  tags: [start, up, deploy, clone]
 
 - import_tasks: tasks/vm_stop.yml
-  tags: [stop,halt]
+  tags: [stop, halt]
 
 - import_tasks: tasks/vm_delete.yml
   tags: [delete]
